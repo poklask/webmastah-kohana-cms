@@ -16,63 +16,20 @@ else
 	require SYSPATH.'classes/Kohana'.EXT;
 }
 
-/**
- * Set the default time zone.
- *
- * @link http://kohanaframework.org/guide/using.configuration
- * @link http://www.php.net/manual/timezones
- */
-date_default_timezone_set('America/Chicago');
-
-/**
- * Set the default locale.
- *
- * @link http://kohanaframework.org/guide/using.configuration
- * @link http://www.php.net/manual/function.setlocale
- */
-setlocale(LC_ALL, 'en_US.utf-8');
-
-/**
- * Enable the Kohana auto-loader.
- *
- * @link http://kohanaframework.org/guide/using.autoloading
- * @link http://www.php.net/manual/function.spl-autoload-register
- */
+date_default_timezone_set('Europe/Warsaw');
+setlocale(LC_ALL, 'pl_PL.utf-8');
 spl_autoload_register(array('Kohana', 'auto_load'));
-
-/**
- * Optionally, you can enable a compatibility auto-loader for use with
- * older modules that have not been updated for PSR-0.
- *
- * It is recommended to not enable this unless absolutely necessary.
- */
-//spl_autoload_register(array('Kohana', 'auto_load_lowercase'));
-
-/**
- * Enable the Kohana auto-loader for unserialization.
- *
- * @link http://www.php.net/manual/function.spl-autoload-call
- * @link http://www.php.net/manual/var.configuration#unserialize-callback-func
- */
 ini_set('unserialize_callback_func', 'spl_autoload_call');
 
-// -- Configuration and initialization -----------------------------------------
+I18n::lang('pl');
 
-/**
- * Set the default language
- */
-I18n::lang('en-us');
-
-/**
- * Set Kohana::$environment if a 'KOHANA_ENV' environment variable has been supplied.
- *
- * Note: If you supply an invalid environment name, a PHP warning will be thrown
- * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
- */
 if (isset($_SERVER['KOHANA_ENV']))
 {
 	Kohana::$environment = constant('Kohana::'.strtoupper($_SERVER['KOHANA_ENV']));
 }
+
+//losoway ciąg znaków do solenia ciastek
+Cookie::$salt = sha1('webmastah.pl');
 
 /**
  * Initialize Kohana, setting the default options.
@@ -91,26 +48,17 @@ if (isset($_SERVER['KOHANA_ENV']))
  */
 Kohana::init(array(
 	'base_url'   => '/',
-    'index_file' => '',
+	'index_file' => '',
 ));
 
-/**
- * Attach the file write to logging. Multiple writers are supported.
- */
-Kohana::$log->attach(new Log_File(APPPATH.'logs'));
 
-/**
- * Attach a file reader to config. Multiple readers are supported.
- */
+Kohana::$log->attach(new Log_File(APPPATH.'logs'));
 Kohana::$config->attach(new Config_File);
 
-/**
- * Enable modules. Modules are referenced by a relative or absolute path.
- */
 Kohana::modules(array(
 	'auth'       => MODPATH.'auth',       // Basic authentication
-    'database'   => MODPATH.'database',   // Database access
-    'orm'        => MODPATH.'orm',        // Object Relationship Mapping
+	'database'   => MODPATH.'database',   // Database access
+	'orm'        => MODPATH.'orm',        // Object Relationship Mapping
 	// 'cache'      => MODPATH.'cache',      // Caching with multiple backends
 	// 'codebench'  => MODPATH.'codebench',  // Benchmarking tool
 	// 'image'      => MODPATH.'image',      // Image manipulation
@@ -124,14 +72,14 @@ Kohana::modules(array(
  * defaults for the URI.
  */
 
-Route::set('catchall', '(<uri>)', array('uri' => '.*'))
-    ->defaults(array(
-        'controller' => 'cms',
-        'action'     => 'index',
-    ));
+Route::set('catchall', '<uri>', array('uri' => '[a-z0-9-_]+'))
+	->defaults(array(
+		'controller' => 'cms',
+		'action'     => 'read',
+	));
 
 Route::set('default', '(<controller>(/<action>(/<id>)))')
 	->defaults(array(
-		'controller' => 'welcome',
+		'controller' => 'cms',
 		'action'     => 'index',
 	));
